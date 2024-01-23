@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Response;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +42,7 @@ $tasks = [
     new Task (
         2,
         'Sell old stuff',
-        'Task 2 descrription',
+        'Task 2 description',
         null,
         false,
         '2023-03-02 12:00:00',
@@ -78,36 +79,46 @@ $tasks = [
  PATCH
 */
 
-// get URL then run function()
-// 1st para = URL pattern
-// using use() to access var outside anonymous func
-Route::get('/', function () use($tasks) {
-    // return view('index.blade.php');
-    return view('index', [
-        // passing data 'name' to view
-        // 'name' => 'Arin'
-        'tasks' => $tasks
-    ]);
+Route::get('/', function () {
+    return redirect('') -> route('tasks.index');
 });
 
-Route::get('/xxx', function () {
-    return 'Hello';
-// giving the name to route >> hello, changing URL doesn't effect to the route's name
-}) -> name('hello');
+// access tasks
+Route::get('/task', function () use($tasks) {
+    return view('index', ['tasks' => $tasks]);
+}) -> name('tasks.index');
 
-Route::get('/great/{name}', function ($name) {
-    // . >> concat
-    return 'Hello ' . $name . '!';
-});
-
-// redirect ROUTE
-Route::get('/hallo', function () {
-    // return redirect('/hello');
-    // redirect to route's name instead URL
-    return redirect() -> route('hello');
-});
+Route::get('/task/{id}', function ($id) use($tasks) {
+    // convert arr to laravel collection obj
+    $task = collect($tasks)->firstWhere('id', $id);
+    if (!$task) {
+        abort(Response::HTTP_NOT_FOUND);
+    }
+    return view('show', ['task' => $task]);
+}) -> name('tasks.show');
 
 // MARK: fallback route = the route that will be called when no other route called is matched
 Route::fallBack(function() {
     return 'Fallback route instead of 404';
 });
+
+// get URL then run function()
+// 1st para = URL pattern
+// using use() to access var outside anonymous func
+// Route::get('/', function () {
+//    return redirect() -> route('hello');
+// });
+// Route::get('/xxx', function () {
+//     return 'Hello';
+// // giving the name to route >> hello, changing URL doesn't effect to the route's name
+// }) -> name('hello');
+// Route::get('/great/{name}', function ($name) {
+//     // . >> concat
+//     return 'Hello ' . $name . '!';
+// });
+// // redirect ROUTE
+// Route::get('/hallo', function () {
+//     // return redirect('/hello');
+//     // redirect to route's name instead URL
+//     return redirect() -> route('hello');
+// });
