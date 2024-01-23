@@ -80,7 +80,7 @@ $tasks = [
 */
 
 Route::get('/', function () {
-    return redirect('') -> route('tasks.index');
+    return redirect() -> route('tasks.index');
 });
 
 // access tasks
